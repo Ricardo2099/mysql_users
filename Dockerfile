@@ -1,20 +1,20 @@
-# Imagen base con Node.js
+# Dockerfile
+
+# 1. Usa la imagen oficial de Node 20
 FROM node:20
 
-# Establecer directorio de trabajo en el contenedor
+# 2. Crea y sitúa en /app
 WORKDIR /app
 
-# Copiar el package.json y package-lock.json
+# 3. Copia package.json y lockfile e instala deps
 COPY package*.json ./
-
-# Instalar las dependencias
 RUN npm install
 
-# Copiar el código fuente
+# 4. Copia el resto del código
 COPY . .
 
-# Exponer el puerto de la aplicación
+# 5. Expón el puerto que usará tu app
 EXPOSE 8080
 
-# Comando para iniciar el servidor
-CMD ["node", "server/index.js"]
+# 6. Al arrancar, primero corre migraciones en producción y luego el servidor
+CMD ["sh", "-c", "npx sequelize-cli db:migrate --env production && node server/index.js"]
