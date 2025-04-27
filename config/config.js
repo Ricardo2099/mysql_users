@@ -1,32 +1,23 @@
-require('dotenv').config();  // Asegúrate de cargar las variables de entorno desde .env
+require('dotenv').config();    // para desarrollo local
+const express = require('express');
+const cors    = require('cors');
+const userRoutes = require('../routes');
 
-console.log('DB_USER:', process.env.DB_USER);  // Verifica que la variable se cargue correctamente
-console.log('DB_PASSWORD:', process.env.DB_PASSWORD);  // Asegúrate de que esta esté bien
-console.log('DB_NAME:', process.env.DB_NAME);
-console.log('DB_HOST:', process.env.DB_HOST);
-console.log('DB_DIALECT:', process.env.DB_DIALECT);
+const app = express();
+const PORT = process.env.PORT || 8080;
 
-// Configuración de Sequelize
-module.exports = {
-  development: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT || 'mysql',  // Valor por defecto si no está definida
-  },
-  test: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: "user-api-test",
-    host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT || 'mysql',
-  },
-  production: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: "user-api-prod",
-    host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT || 'mysql',
-  },
-};
+app.use(cors());
+app.use(express.json());
+
+// Rutas usuarios
+app.use('/api/users', userRoutes);
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
+
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+});
